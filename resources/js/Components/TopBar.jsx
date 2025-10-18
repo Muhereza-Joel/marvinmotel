@@ -10,7 +10,7 @@ export default function TopBar() {
                         href="tel:+256700123456"
                         className="flex items-center space-x-1 hover:underline"
                     >
-                        <span className="px-2 ml-2 sm:ml-9">Call Un On: </span>
+                        <span className="px-2 ml-2 sm:ml-9">Call Us On: </span>
                         <Phone className="w-4 h-4" />
                         <span>+256 772 623 456</span>
                         <Phone className="w-4 h-4" />

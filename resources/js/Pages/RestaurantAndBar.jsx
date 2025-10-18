@@ -1,12 +1,12 @@
 import PublicLayout from "@/Layouts/PublicLayout";
 import React from "react";
 
-function Home() {
+function RestaurantAndBar() {
     return (
         <PublicLayout>
-            <h1>Home Page</h1>
+            <div>RestaurantAndBar</div>
         </PublicLayout>
     );
 }
 
-export default Home;
+export default RestaurantAndBar;

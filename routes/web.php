@@ -9,6 +9,28 @@ Route::get('/', function () {
     return Inertia::render('Home');
 })->name('root');
 
+Route::get('/about-us', function () {
+    return Inertia::render('AboutUs');
+})->name('about');
+
+Route::get('/restaurant-and-bar', function () {
+    return Inertia::render('RestaurantAndBar');
+})->name('restaurantbar');
+
+Route::get('/contact-us', function () {
+    return Inertia::render('ContactUs');
+})->name('contact');
+
+Route::get('/gallery', function () {
+    return Inertia::render('Gallery');
+})->name('gallery');
+
+
+
+
+
+
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

@@ -49,12 +49,35 @@ export default function PublicLayout({ title, children }) {
 
                                 {/* Desktop Links */}
                                 <div className="hidden sm:flex sm:space-x-6">
-                                    {/* <NavLink
+                                    <NavLink
                                         href={route("about")}
                                         active={route().current("about")}
                                     >
                                         About Us
-                                    </NavLink> */}
+                                    </NavLink>
+
+                                    <NavLink
+                                        href={route("restaurantbar")}
+                                        active={route().current(
+                                            "restaurantbar"
+                                        )}
+                                    >
+                                        Restaurant & Bar
+                                    </NavLink>
+
+                                    <NavLink
+                                        href={route("gallery")}
+                                        active={route().current("gallery")}
+                                    >
+                                        Gallery
+                                    </NavLink>
+
+                                    <NavLink
+                                        href={route("contact")}
+                                        active={route().current("contact")}
+                                    >
+                                        Contact Us
+                                    </NavLink>
                                 </div>
 
                                 {/* Right: Book Now & Hamburger */}
@@ -106,7 +129,7 @@ export default function PublicLayout({ title, children }) {
                 </header>
 
                 {/* Page Content */}
-                <main className="bg-white flex-grow transition-colors duration-500">
+                <main className="bg-white flex-grow transition-colors duration-500 pt-32">
                     {children}
                 </main>
 

@@ -1,12 +1,12 @@
 import PublicLayout from "@/Layouts/PublicLayout";
 import React from "react";
 
-function Home() {
+function Gallery() {
     return (
         <PublicLayout>
-            <h1>Home Page</h1>
+            <div>Gallery</div>
         </PublicLayout>
     );
 }
 
-export default Home;
+export default Gallery;
