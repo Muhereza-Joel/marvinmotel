@@ -16,7 +16,7 @@ export default function Footer() {
                             Marvin Motel Katunguru is a few kilometers from
                             Queen Elizabeth National Park. We ensure that our
                             customers relax and enjoy the stay. Book now and
-                            feel right at home.
+                            feel right at home!
                         </p>
                     </div>
                     {/* Customer Service */}
