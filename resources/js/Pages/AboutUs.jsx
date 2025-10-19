@@ -1,11 +1,13 @@
 import CoreValues from "@/Components/CoreValues";
 import HeroSection from "@/Components/HeroSection";
 import PublicLayout from "@/Layouts/PublicLayout";
+import { Head } from "@inertiajs/react";
 import React from "react";
 
 function AboutUs({ entranceImage, diningImage, bedImage }) {
     return (
         <PublicLayout>
+            <Head title="About Us" />
             <HeroSection
                 titles={[
                     "Know More About Marvin motel katunguru",

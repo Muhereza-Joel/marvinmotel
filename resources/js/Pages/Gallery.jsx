@@ -1,7 +1,7 @@
 import React from "react";
 import PublicLayout from "@/Layouts/PublicLayout";
 import PictorialGallery from "@/Components/PictorialGallery";
-import { usePage } from "@inertiajs/react";
+import { Head, usePage } from "@inertiajs/react";
 
 export default function Gallery() {
     const {
@@ -51,6 +51,7 @@ export default function Gallery() {
 
     return (
         <PublicLayout>
+            <Head title="Our Gallery" />
             <PictorialGallery images={images} />
         </PublicLayout>
     );

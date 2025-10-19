@@ -1,10 +1,12 @@
 import HeroSection from "@/Components/HeroSection";
 import PublicLayout from "@/Layouts/PublicLayout";
+import { Head } from "@inertiajs/react";
 import React from "react";
 
 function RestaurantAndBar({ dining2Image, barImage }) {
     return (
         <PublicLayout>
+            <Head title="Restaurant & Bar" />
             <HeroSection
                 titles={[
                     "Refresh Your Mind in Our Fantastic Bar",
