@@ -66,17 +66,17 @@ export default function PublicLayout({ title, children }) {
                                     </NavLink>
 
                                     <NavLink
-                                        href={route("gallery")}
-                                        active={route().current("gallery")}
-                                    >
-                                        Gallery
-                                    </NavLink>
-
-                                    <NavLink
                                         href={route("contact")}
                                         active={route().current("contact")}
                                     >
                                         Contact Us
+                                    </NavLink>
+
+                                    <NavLink
+                                        href={route("gallery")}
+                                        active={route().current("gallery")}
+                                    >
+                                        Gallery
                                     </NavLink>
                                 </div>
 

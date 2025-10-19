@@ -5,8 +5,8 @@ import { ChevronRight } from "lucide-react";
 
 export default function HeroSection({
     titles = [],
+    images = [], // NEW: Array of images to sync with titles
     subtitle,
-    image,
     bgImage,
     bgColor = "bg-gray-100 dark:bg-gray-800",
     textColor = "text-gray-900 dark:text-gray-100",
@@ -19,12 +19,23 @@ export default function HeroSection({
     buttonText = "",
     buttonLink = "",
     buttonColor = "bg-blue-600 text-white hover:bg-blue-700",
+    // NEW IMAGE PROPS
+    imageWidth = "100%",
+    imageHeight = "24rem",
+    imageObjectFit = "cover",
+    imageShape = "rectangle", // "rectangle", "oval", "circle", "pentagon", "hexagon", "diamond", "morph"
+    imageAnimationDirection = "right", // "left", "right", "top", "bottom"
+    enableMorph = false,
 }) {
     const [index, setIndex] = useState(0);
     const [text, setText] = useState("");
     const [isTyping, setIsTyping] = useState(true);
 
     const computedTextColor = bgImage ? "text-white" : textColor;
+
+    // Ensure images is always an array and handle single image case
+    const imageArray = Array.isArray(images) ? images : images ? [images] : [];
+    const hasMultipleImages = imageArray.length > 1;
 
     // Typing Animation
     useEffect(() => {
@@ -57,7 +68,148 @@ export default function HeroSection({
             );
     }, [index, titles, rotationSpeed, animationMode]);
 
-    const variants = {
+    // Morphing animation variants
+    const morphVariants = {
+        animate: {
+            borderRadius: [
+                "60% 40% 30% 70% / 60% 30% 70% 40%",
+                "50% 50% 60% 40% / 50% 60% 40% 50%",
+                "40% 60% 70% 30% / 40% 70% 30% 60%",
+                "60% 40% 30% 70% / 60% 30% 70% 40%",
+            ],
+            transition: {
+                borderRadius: {
+                    duration: 10,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                    ease: "easeInOut",
+                },
+            },
+        },
+    };
+
+    // Get slide animation variants based on direction
+    const getSlideVariants = (direction) => {
+        const distance = 100;
+        switch (direction) {
+            case "left":
+                return {
+                    hidden: { opacity: 0, x: -distance },
+                    visible: {
+                        opacity: 1,
+                        x: 0,
+                        transition: { duration: 0.8, ease: "easeOut" },
+                    },
+                };
+            case "right":
+                return {
+                    hidden: { opacity: 0, x: distance },
+                    visible: {
+                        opacity: 1,
+                        x: 0,
+                        transition: { duration: 0.8, ease: "easeOut" },
+                    },
+                };
+            case "top":
+                return {
+                    hidden: { opacity: 0, y: -distance },
+                    visible: {
+                        opacity: 1,
+                        y: 0,
+                        transition: { duration: 0.8, ease: "easeOut" },
+                    },
+                };
+            case "bottom":
+                return {
+                    hidden: { opacity: 0, y: distance },
+                    visible: {
+                        opacity: 1,
+                        y: 0,
+                        transition: { duration: 0.8, ease: "easeOut" },
+                    },
+                };
+            default:
+                return {
+                    hidden: { opacity: 0, scale: 0.9 },
+                    visible: {
+                        opacity: 1,
+                        scale: 1,
+                        transition: { duration: 0.6, delay: 0.2 },
+                    },
+                };
+        }
+    };
+
+    // Get shape classes based on imageShape prop
+    const getShapeClass = () => {
+        switch (imageShape) {
+            case "oval":
+                return "rounded-[50%]";
+            case "circle":
+                return "rounded-full";
+            case "pentagon":
+                return "clip-pentagon";
+            case "hexagon":
+                return "clip-hexagon";
+            case "diamond":
+                return "clip-diamond rotate-45";
+            case "morph":
+                return "rounded-lg"; // Morph effect will be handled by animation
+            case "rectangle":
+            default:
+                return "rounded-lg";
+        }
+    };
+
+    // Image container with conditional styling and animations
+    const ImageContainer = ({ children, currentIndex }) => {
+        const shapeClass = getShapeClass();
+        const baseClasses = `relative overflow-hidden shadow-lg ${shapeClass}`;
+
+        const isMorphShape = imageShape === "morph" || enableMorph;
+        const slideVariants = getSlideVariants(imageAnimationDirection);
+
+        if (isMorphShape) {
+            return (
+                <motion.div
+                    className={baseClasses}
+                    style={{
+                        width: imageWidth,
+                        height: imageHeight,
+                        maxHeight: imageHeight,
+                    }}
+                    variants={morphVariants}
+                    animate="animate"
+                    whileHover={{
+                        scale: 1.02,
+                        transition: { duration: 0.3 },
+                    }}
+                >
+                    {children}
+                </motion.div>
+            );
+        }
+
+        return (
+            <motion.div
+                className={baseClasses}
+                style={{
+                    width: imageWidth,
+                    height: imageHeight,
+                    maxHeight: imageHeight,
+                }}
+                variants={slideVariants}
+                whileHover={{
+                    scale: 1.02,
+                    transition: { duration: 0.3 },
+                }}
+            >
+                {children}
+            </motion.div>
+        );
+    };
+
+    const textVariants = {
         hidden: {
             opacity: 0,
             y:
@@ -69,6 +221,17 @@ export default function HeroSection({
         },
         visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
     };
+
+    // Get current image based on index
+    const getCurrentImage = () => {
+        if (imageArray.length === 0) return null;
+        if (hasMultipleImages) {
+            return imageArray[index % imageArray.length];
+        }
+        return imageArray[0];
+    };
+
+    const currentImage = getCurrentImage();
 
     return (
         <section
@@ -86,7 +249,7 @@ export default function HeroSection({
                 <motion.div
                     initial="hidden"
                     animate="visible"
-                    variants={variants}
+                    variants={textVariants}
                     className="flex flex-col"
                 >
                     <h1
@@ -174,29 +337,69 @@ export default function HeroSection({
                     )}
                 </motion.div>
 
-                {image && (
+                {currentImage && (
                     <motion.div
                         initial="hidden"
                         animate="visible"
-                        variants={{
-                            hidden: { opacity: 0, scale: 0.9 },
-                            visible: {
-                                opacity: 1,
-                                scale: 1,
-                                transition: { duration: 0.6, delay: 0.2 },
-                            },
-                        }}
                         className="flex justify-center"
                     >
-                        <img
-                            src={image}
-                            alt={titles[index % titles.length] || "Hero image"}
-                            className="rounded-lg shadow-lg max-h-96 w-full object-cover"
-                            loading="lazy"
-                        />
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={index}
+                                initial="hidden"
+                                animate="visible"
+                                exit="hidden"
+                                className="w-full"
+                            >
+                                <ImageContainer currentIndex={index}>
+                                    <img
+                                        src={currentImage}
+                                        alt={
+                                            titles[index % titles.length] ||
+                                            "Hero image"
+                                        }
+                                        className={`w-full h-full ${
+                                            imageShape === "diamond"
+                                                ? "-rotate-45"
+                                                : ""
+                                        }`}
+                                        style={{ objectFit: imageObjectFit }}
+                                        loading="lazy"
+                                    />
+                                    {/* Subtle gradient overlay for depth */}
+                                    <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black/10"></div>
+                                </ImageContainer>
+                            </motion.div>
+                        </AnimatePresence>
                     </motion.div>
                 )}
             </div>
+
+            {/* Add CSS for custom shapes */}
+            <style jsx>{`
+                .clip-pentagon {
+                    clip-path: polygon(
+                        50% 0%,
+                        100% 38%,
+                        82% 100%,
+                        18% 100%,
+                        0% 38%
+                    );
+                }
+                .clip-hexagon {
+                    clip-path: polygon(
+                        25% 0%,
+                        75% 0%,
+                        100% 50%,
+                        75% 100%,
+                        25% 100%,
+                        0% 50%
+                    );
+                }
+                .clip-diamond {
+                    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+                }
+            `}</style>
         </section>
     );
 }

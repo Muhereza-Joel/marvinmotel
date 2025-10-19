@@ -2,7 +2,7 @@ import HeroSection from "@/Components/HeroSection";
 import PublicLayout from "@/Layouts/PublicLayout";
 import React from "react";
 
-function AboutUs({ entranceImage }) {
+function AboutUs({ entranceImage, diningImage, bedImage }) {
     return (
         <PublicLayout>
             <HeroSection
@@ -14,11 +14,12 @@ function AboutUs({ entranceImage }) {
                 rotationSpeed={5000} // keep smooth rotation
                 subtitle="We have well furnished rooms, including stardard suites and twin doubles, all
                 equipped with bathrooms, hot and cold water, DSTV and free Wifi."
-                image={entranceImage}
+                images={[entranceImage, diningImage, bedImage]}
                 bgColor="bg-green-50"
                 buttonText="Learn More"
                 buttonLink="#about"
                 buttonColor="bg-amber-600 text-white hover:bg-amber-700"
+                imageAnimationDirection="bottom"
             />
 
             <section className="text-justify mt-10 max-w-7xl mx-auto px-4">

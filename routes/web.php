@@ -11,12 +11,17 @@ Route::get('/', function () {
 
 Route::get('/about-us', function () {
     return Inertia::render('AboutUs', [
-        'entranceImage' => asset('assets/images/entrance.jpg'),
+        'entranceImage' => asset('assets/images/behind.jpg'),
+        'diningImage' => asset('assets/images/dining.jpg'),
+        'bedImage' => asset('assets/images/bed.jpg'),
     ]);
 })->name('about');
 
 Route::get('/restaurant-and-bar', function () {
-    return Inertia::render('RestaurantAndBar');
+    return Inertia::render('RestaurantAndBar',  [
+        'dining2Image' => asset('assets/images/dining2.jpg'),
+        'barImage' => asset('assets/images/bar.jpg'),
+    ]);
 })->name('restaurantbar');
 
 Route::get('/contact-us', function () {
