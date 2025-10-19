@@ -10,7 +10,9 @@ Route::get('/', function () {
 })->name('root');
 
 Route::get('/about-us', function () {
-    return Inertia::render('AboutUs');
+    return Inertia::render('AboutUs', [
+        'entranceImage' => asset('assets/images/entrance.jpg'),
+    ]);
 })->name('about');
 
 Route::get('/restaurant-and-bar', function () {
