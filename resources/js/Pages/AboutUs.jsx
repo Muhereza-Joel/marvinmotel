@@ -1,3 +1,4 @@
+import CoreValues from "@/Components/CoreValues";
 import HeroSection from "@/Components/HeroSection";
 import PublicLayout from "@/Layouts/PublicLayout";
 import React from "react";
@@ -47,7 +48,7 @@ function AboutUs({ entranceImage, diningImage, bedImage }) {
                     you can connect with others and create lasting memories.
                     Engage in local culture with music, dance and drama events.
                     We also provide 24 hour security to ensure the safety of our
-                    guests and their belongings
+                    guests and their belongings.
                 </p>
 
                 <p className="text-lg text-gray-700 mb-4">
@@ -57,8 +58,28 @@ function AboutUs({ entranceImage, diningImage, bedImage }) {
                     hippos and elephants roaming just 20 meters away. Whether
                     you are a foreigner or a local. Marvin Motel is a great
                     place to stay, dine, unwind, explore and meet new people,
-                    creating unforgatable memories
+                    creating unforgatable memories.
                 </p>
+
+                <h3 className="text-3xl font-bold text-gray-800 mb-4 mt-6">
+                    Our Vision
+                </h3>
+
+                <p className="text-lg text-gray-700 mb-4">
+                    Redefine the hospitality experience in by blending nature,
+                    comfort and culture into one seamless encounter.
+                </p>
+
+                <h3 className="text-3xl font-bold text-gray-800 mb-4 mt-6">
+                    Our Mission
+                </h3>
+
+                <p className="text-lg text-gray-700 mb-4">
+                    Provide Authentic, Confortable and Eco-conscious hospitality
+                    that reflects the warmth of Uganda.
+                </p>
+
+                <CoreValues />
             </section>
         </PublicLayout>
     );

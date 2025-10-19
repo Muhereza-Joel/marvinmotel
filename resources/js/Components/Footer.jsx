@@ -30,9 +30,9 @@ export default function Footer() {
                         </h5>
 
                         <p className="text-gray-300">
-                            Plot No 1, Katunguru, Kasese District
+                            Katunguru, Kasese District
                         </p>
-                        <p className="text-gray-300">P.O. Box 840, Kasese</p>
+                        <p className="text-gray-300">P.O. Box 430477, Kasese</p>
 
                         <h5 className="text-gray-400 mb-2 mt-3">Talk to us:</h5>
                         <p className="text-gray-300">
