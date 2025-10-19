@@ -29,7 +29,27 @@ Route::get('/contact-us', function () {
 })->name('contact');
 
 Route::get('/gallery', function () {
-    return Inertia::render('Gallery');
+    return Inertia::render('Gallery', [
+        'image1' => asset('assets/images/bar.jpg'),
+        'image2' => asset('assets/images/bathroom.jpg'),
+        'image3' => asset('assets/images/bed.jpg'),
+        'image4' => asset('assets/images/behind.jpg'),
+        'image5' => asset('assets/images/dining2.jpg'),
+        'image6' => asset('assets/images/corridle.jpg'),
+        'image7' => asset('assets/images/toilet.jpg'),
+        'image8' => asset('assets/images/sink.jpg'),
+        'image9' => asset('assets/images/double.jpg'),
+        'image10' => asset('assets/images/toilet2.jpg'),
+        'image11' => asset('assets/images/toilet3.jpg'),
+        'image12' => asset('assets/images/double2.jpg'),
+        'image13' => asset('assets/images/single.jpg'),
+        'image14' => asset('assets/images/double3.jpg'),
+        'image15' => asset('assets/images/net.jpg'),
+        'image16' => asset('assets/images/dining.jpg'),
+        'image17' => asset('assets/images/entrance.jpg'),
+        'image18' => asset('assets/images/double4.jpg'),
+        'image19' => asset('assets/images/side.jpg'),
+    ]);
 })->name('gallery');
 
 
