@@ -447,7 +447,7 @@ export default function HeroSection({
                     )}
 
                     <h1
-                        className={`font-extrabold text-5xl sm:text-8xl mb-6 min-h-[4.5rem] relative ${
+                        className={`font-extrabold text-white text-5xl sm:text-8xl mb-6 min-h-[4.5rem] relative ${
                             titleGradient
                                 ? `bg-clip-text text-transparent ${titleGradient}`
                                 : computedTextColor

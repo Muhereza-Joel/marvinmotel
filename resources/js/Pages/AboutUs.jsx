@@ -26,7 +26,6 @@ function AboutUs({ entranceImage, diningImage, bedImage }) {
                 pattern="topography"
                 glowEffect={true}
                 particleEffect={true}
-                titleGradient="text-gray-50"
             />
 
             <section className="text-justify mt-10 max-w-7xl mx-auto px-4">
