@@ -3,12 +3,12 @@ import { Link } from "@inertiajs/react";
 
 export default function Footer() {
     return (
-        <footer className="bg-[#041c30] border-t border-gray-700 mt-auto">
+        <footer className="bg-black border-t pb-24 pt-10 border-gray-700 mt-auto">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                     {/* Shop */}
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-200 mb-4">
+                        <h3 className="text-lg font-thin text-gray-200 mb-4">
                             Dine At Marvin Motel
                         </h3>
                         <div className="bg-green-500 w-52 h-[5px] mb-2"></div>
@@ -21,7 +21,7 @@ export default function Footer() {
                     </div>
                     {/* Customer Service */}
                     <div>
-                        <h3 className="text-3xl font-semibold text-gray-200 mb-4">
+                        <h3 className="text-3xl font-extralight text-gray-200 mb-4">
                             Contact Us
                         </h3>
 
@@ -46,7 +46,7 @@ export default function Footer() {
 
                     {/* About Us */}
                     <div>
-                        <h3 className="text-3xl font-semibold text-gray-200 mb-4">
+                        <h3 className="text-3xl font-extralight text-gray-200 mb-4">
                             Working Hours
                         </h3>
                         <p className="text-gray-300">
@@ -56,7 +56,7 @@ export default function Footer() {
 
                     {/* Social & Newsletter */}
                     <div>
-                        <h3 className="text-3xl font-semibold text-gray-200 mb-4">
+                        <h3 className="text-3xl font-extralight text-gray-200 mb-4">
                             Stay Connected
                         </h3>
                         <div className="flex space-x-4 mb-4">
@@ -129,7 +129,7 @@ export default function Footer() {
                         </div>
                     </div>
                 </div>
-                <div className="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400 text-sm">
+                <div className="mt-8 pt-16 border-t border-gray-700 text-center text-gray-400 text-sm">
                     <p>
                         &copy; {new Date().getFullYear()} Marvin Motel. All
                         rights reserved.

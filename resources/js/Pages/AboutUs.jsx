@@ -12,17 +12,21 @@ function AboutUs({ entranceImage, diningImage, bedImage }) {
                 titles={[
                     "Know More About Marvin motel katunguru",
                     "Delightful Dining Experience You Deserve",
-                    "Comfortable and Affordable Accommodations",
+                    "Comfortable And Affordable Rooms",
                 ]}
                 rotationSpeed={5000} // keep smooth rotation
                 subtitle="We have well furnished rooms, including stardard suites and twin doubles, all
                 equipped with bathrooms, hot and cold water, DSTV and free Wifi."
                 images={[entranceImage, diningImage, bedImage]}
-                bgColor="bg-green-50"
+                bgColor="bg-blue-800"
                 buttonText="Learn More"
                 buttonLink="#about"
                 buttonColor="bg-amber-600 text-white hover:bg-amber-700"
                 imageAnimationDirection="bottom"
+                pattern="topography"
+                glowEffect={true}
+                particleEffect={true}
+                titleGradient="text-gray-50"
             />
 
             <section className="text-justify mt-10 max-w-7xl mx-auto px-4">

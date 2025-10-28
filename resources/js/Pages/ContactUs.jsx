@@ -13,11 +13,12 @@ function ContactUs() {
                 animationMode="typing"
                 typingSpeed={50} // keep smooth rotation
                 subtitle="Incase you have any querries, always reach us. Your Feedback is valuable in improving customer services."
-                bgColor="bg-orange-50"
+                bgColor="bg-blue-800"
                 buttonText="Talks To Us Today"
                 buttonLink="#about"
                 buttonColor="bg-amber-600 text-white hover:bg-amber-700"
                 imageAnimationDirection="bottom"
+                titleGradient="text-gray-50"
             />
 
             <ContactForm />

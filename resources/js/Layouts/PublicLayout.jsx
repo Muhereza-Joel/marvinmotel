@@ -128,16 +128,18 @@ export default function PublicLayout({ title, children }) {
                     </nav>
                 </header>
 
-                {/* Page Content */}
-                <main className="bg-white flex-grow transition-colors duration-500 pt-32">
+                {/* Page Content - Takes remaining space */}
+                <main className="flex-grow bg-white transition-colors duration-500 pt-32 min-h-[calc(100vh-8rem)]">
                     {children}
                 </main>
 
-                {/* Footer */}
-                <BackToTop />
-                <CookieBanner />
-                <Footer />
-                <ToastContainer position="bottom-right" autoClose={5000} />
+                {/* Footer - Sticks to bottom */}
+                <div className="mt-auto">
+                    <BackToTop />
+                    <CookieBanner />
+                    <Footer />
+                    <ToastContainer position="bottom-right" autoClose={5000} />
+                </div>
             </div>
         </>
     );
