@@ -1,1 +1,0 @@
-import{j as e,H as t}from"./app-Dn4pDs0n.js";import{P as o}from"./PublicLayout-DwDXMmVt.js";function a(){return e.jsxs(o,{children:[e.jsx(t,{title:"Welcome"}),e.jsx("h1",{children:"Home Page"})]})}export{a as default};
