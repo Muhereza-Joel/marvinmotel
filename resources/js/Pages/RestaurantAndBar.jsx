@@ -3,7 +3,7 @@ import PublicLayout from "@/Layouts/PublicLayout";
 import { Head } from "@inertiajs/react";
 import React from "react";
 
-function RestaurantAndBar({ dining2Image, barImage }) {
+function RestaurantAndBar({ dining2Image, barImage, barImage2 }) {
     return (
         <PublicLayout>
             <Head title="Restaurant & Bar" />
@@ -37,7 +37,7 @@ function RestaurantAndBar({ dining2Image, barImage }) {
                                 made with fresh ingredients and care.
                             </p>
                             <p className="text-gray-600 mb-4">
-                                Try our special tilapia fish - a local favorite
+                                Try our special tilapia fish a local favorite
                                 that keeps guests coming back. Cooked just right
                                 with traditional spices and herbs.
                             </p>
@@ -64,7 +64,7 @@ function RestaurantAndBar({ dining2Image, barImage }) {
                         <div className="order-2 md:order-1">
                             <div className="rounded-lg overflow-hidden shadow-lg">
                                 <img
-                                    src={barImage}
+                                    src={barImage2}
                                     alt="Bar area"
                                     className="w-full h-80 object-cover"
                                 />

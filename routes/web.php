@@ -6,7 +6,12 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Home');
+    return Inertia::render('Home', [
+        'image3' => asset('assets/images/bed.jpg'),
+        'image4' => asset('assets/images/behind.jpg'),
+        'image5' => asset('assets/images/dining2.jpg'),
+        'image6' => asset('assets/images/corridle.jpg'),
+    ]);
 })->name('root');
 
 Route::get('/about-us', function () {
@@ -21,6 +26,7 @@ Route::get('/restaurant-and-bar', function () {
     return Inertia::render('RestaurantAndBar',  [
         'dining2Image' => asset('assets/images/dining2.jpg'),
         'barImage' => asset('assets/images/bar.jpg'),
+        'barImage2' => asset('assets/images/bar3.jpg'),
     ]);
 })->name('restaurantbar');
 

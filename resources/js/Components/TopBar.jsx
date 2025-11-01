@@ -2,7 +2,7 @@ import { Phone, Mail, Facebook, Instagram } from "lucide-react";
 
 export default function TopBar() {
     return (
-        <div className="w-full bg-gray-100 text-gray-900 text-sm py-2 px-0">
+        <div className="w-full bg-gray-100 text-gray-900 text-sm py-3 px-0">
             <div className="max-w-7xl mx-auto flex justify-between items-center">
                 {/* Left: Contacts */}
                 <div className="flex space-x-8">

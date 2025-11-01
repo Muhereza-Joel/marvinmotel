@@ -37,11 +37,11 @@ function AboutUs({ entranceImage, diningImage, bedImage }) {
                 </h2>
 
                 <p className="text-lg text-gray-700 mb-4">
-                    Marvin Motel Katunguru is a high way gem in the heart of
-                    Queen Elizabeth National Park. Located along the{" "}
+                    Marvin Motel Katunguru is a sanctuary of Queen Elizabeth
+                    National Park. Located along the{" "}
                     <span className="text-orange-700">
-                        Kasese Mbarara Highway just 221 kilometers from Mbarara
-                        City and 111 kilometers from Fort Portal Tourism City
+                        Kasese Mbarara Highway just a few kilometers from
+                        Mbarara City and Fort Portal Tourism City
                     </span>
                     , We Offer Confortable and Affordable accomodations with a
                     perfect blend of modern ammenities and traditional
