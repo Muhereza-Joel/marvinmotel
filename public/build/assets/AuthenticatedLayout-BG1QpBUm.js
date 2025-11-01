@@ -1,0 +1,1 @@
+import{j as s}from"./app-CKsMlCqo.js";import{P as a}from"./PublicLayout-CHUfjQX7.js";function o({title:t,children:x}){return s.jsx(a,{title:t,children:s.jsx("div",{className:"max-w-7xl mx-auto py-6 sm:px-6 lg:px-8",children:s.jsx("div",{className:"px-4 py-6 sm:px-0",children:x})})})}export{o as A};
