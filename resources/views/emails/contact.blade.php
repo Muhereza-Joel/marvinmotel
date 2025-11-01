@@ -28,11 +28,13 @@ Queen Elizabeth National Park. We ensure that our
 customers relax and enjoy the stay. Book now and
 feel right at home!
 
+## 📍 Contact Us
+
 📧 **info@marvinmotel.com**
 📧 **sales@marvinmotel.com**
 📧 **mwesigyerobert83@yahoo.com**
 📞 **+256 772 623 456 / +256 758 262 114**
-🕘 **Mon–Fri · 9am – 6pm**
+🕘 **We are always open 24/7**
 
 ---
 

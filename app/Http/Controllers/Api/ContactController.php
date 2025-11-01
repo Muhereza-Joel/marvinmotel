@@ -28,7 +28,7 @@ class ContactController extends Controller
         $data = $request->only(['firstName', 'lastName', 'email', 'message']);
 
         try {
-            Mail::to('muherezajoel40@gmail.com')->send(new ContactFormMail($data));
+            Mail::to(['info@marvinmotel.com', 'sales@marvinmotel.com', 'mwesigyerobert83@yahoo.com'])->send(new ContactFormMail($data));
 
             return response()->json([
                 'success' => true,

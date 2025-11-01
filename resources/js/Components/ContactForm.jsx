@@ -65,7 +65,7 @@ export default function ContactForm() {
                 });
 
                 alert(
-                    "Thank you for contacting Karangura Peak Coffee! Your message has been sent successfully!"
+                    "Thank you for contacting Marvin Motel! Your message has been sent successfully!"
                 );
             } else {
                 setSubmitStatus("error");
