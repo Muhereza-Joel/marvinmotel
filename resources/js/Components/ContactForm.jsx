@@ -43,7 +43,7 @@ export default function ContactForm() {
 
         try {
             const response = await fetch(
-                "https://api.marvinmotel.com/api/v1/contact",
+                "https://marvinmotel.com/api/v1/contact",
                 {
                     method: "POST",
                     headers: {
