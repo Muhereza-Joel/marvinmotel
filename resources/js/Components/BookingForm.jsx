@@ -209,10 +209,13 @@ export default function BookingForm() {
         }
 
         try {
-            await axios.post("/api/send-booking-email", {
-                ...formData,
-                ...priceDetails,
-            });
+            await axios.post(
+                "https://marvinmotel.com/api/v1/send-booking-email",
+                {
+                    ...formData,
+                    ...priceDetails,
+                }
+            );
             setStatusMessage(
                 "✅ Booking request sent successfully! We'll confirm your reservation shortly."
             );
