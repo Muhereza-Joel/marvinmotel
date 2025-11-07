@@ -10,7 +10,7 @@ export default function HomeHeroFull({
             subtitle:
                 "Nestled near the heart of Queen Elizabeth National Park, Marvin Motel Katunguru offers a peaceful retreat surrounded by breathtaking wildlife, tranquil scenery, and authentic Ugandan hospitality.",
             buttonText: "Book Your Stay",
-            buttonLink: "/booking",
+            buttonLink: "#booking",
         },
         {
             image: "/assets/images/lakeview2.jfif",
@@ -18,7 +18,7 @@ export default function HomeHeroFull({
             subtitle:
                 "Wake up to the sounds of birds and the gentle whispers of the Kazinga Channel. Enjoy our modern rooms designed for both comfort and relaxation, blending elegance with nature.",
             buttonText: "View Rooms",
-            buttonLink: "/rooms",
+            buttonLink: "#booking",
         },
         {
             image: "/assets/images/bed4.jpg",
@@ -26,7 +26,7 @@ export default function HomeHeroFull({
             subtitle:
                 "Whether you’re here for a safari, a family getaway, or a romantic escape, Marvin Motel Katunguru is the perfect base for exploring the wonders of Western Uganda while enjoying personalized care.",
             buttonText: "Explore Nearby Attractions",
-            buttonLink: "/attractions",
+            buttonLink: "#booking",
         },
     ],
     slideInterval = 7000,

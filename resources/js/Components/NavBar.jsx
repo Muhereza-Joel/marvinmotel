@@ -95,12 +95,14 @@ export default function NavBar() {
                     {/* Right: Book Now & Hamburger */}
                     <div className="flex items-center space-x-4">
                         {/* Optional Book Now Button */}
-                        <Link
-                            href="#booking"
-                            className="hidden sm:inline-block px-8 py-2 bg-orange-600 text-white rounded-full shadow hover:bg-orange-700 transition-colors duration-300"
-                        >
-                            Book Now
-                        </Link>
+                        {route().current("root") && (
+                            <Link
+                                href="#booking"
+                                className="hidden sm:inline-block px-8 py-2 bg-orange-600 text-white rounded-full shadow hover:bg-orange-700 transition-colors duration-300"
+                            >
+                                Book Now
+                            </Link>
+                        )}
 
                         {/* Mobile Hamburger */}
                         <button
