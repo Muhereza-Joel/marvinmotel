@@ -1,5 +1,6 @@
 import CoreValues from "@/Components/CoreValues";
 import HeroSection from "@/Components/HeroSection";
+import SEOTemplate from "@/Components/SEOTemplate";
 import PublicLayout from "@/Layouts/PublicLayout";
 import { Head } from "@inertiajs/react";
 import React from "react";
@@ -8,6 +9,37 @@ function AboutUs({ entranceImage, diningImage, bedImage }) {
     return (
         <PublicLayout>
             <Head title="About Us" />
+            <SEOTemplate
+                title="About Us"
+                description="Marvin Motel Katunguru is a welcoming lodge located near Queen Elizabeth National Park and overlooking the Kazinga Channel. We offer comfortable rooms, peaceful surroundings, and hospitality rooted in community and nature."
+                keywords="Marvin Motel Katunguru, About Marvin Motel, Kazinga Channel accommodation, Hotels near Queen Elizabeth National Park, Uganda safari lodge, Kasese hospitality, Community tourism Uganda, Nature lodge Katunguru, Affordable motel Western Uganda"
+                url="https://marvinmotel.com/about-us"
+            />
+
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        itemListElement: [
+                            {
+                                "@type": "ListItem",
+                                position: 1,
+                                name: "Home",
+                                item: "https://marvinmotel.com",
+                            },
+                            {
+                                "@type": "ListItem",
+                                position: 2,
+                                name: "About Us",
+                                item: "https://marvinmotel.com/about-us",
+                            },
+                        ],
+                    }),
+                }}
+            />
+
             <HeroSection
                 titles={[
                     "Know More About Marvin motel katunguru",

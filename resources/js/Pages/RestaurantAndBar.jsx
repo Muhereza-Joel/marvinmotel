@@ -1,4 +1,5 @@
 import HeroSection from "@/Components/HeroSection";
+import SEOTemplate from "@/Components/SEOTemplate";
 import PublicLayout from "@/Layouts/PublicLayout";
 import { Head } from "@inertiajs/react";
 import React from "react";
@@ -7,6 +8,13 @@ function RestaurantAndBar({ dining2Image, barImage, barImage2 }) {
     return (
         <PublicLayout>
             <Head title="Restaurant & Bar" />
+            <SEOTemplate
+                title="Restaurant & Bar"
+                description="Enjoy freshly prepared meals, cold drinks, and warm hospitality at the Marvin Motel Restaurant & Bar — overlooking the natural beauty of Katunguru and the Kazinga Channel."
+                keywords="Marvin Motel Restaurant, Katunguru food and drinks, safari lodge dining, restaurant near Kazinga Channel, bar Queen Elizabeth National Park, local Ugandan meals accommodation"
+                url="https://marvinmotel.com/restaurant-and-bar"
+            />
+
             <HeroSection
                 titles={[
                     "Refresh Your Mind in Our Fantastic Bar",

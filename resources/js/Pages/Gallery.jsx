@@ -2,6 +2,7 @@ import React from "react";
 import PublicLayout from "@/Layouts/PublicLayout";
 import PictorialGallery from "@/Components/PictorialGallery";
 import { Head, usePage } from "@inertiajs/react";
+import SEOTemplate from "@/Components/SEOTemplate";
 
 export default function Gallery() {
     const {
@@ -52,6 +53,13 @@ export default function Gallery() {
     return (
         <PublicLayout>
             <Head title="Our Gallery" />
+            <SEOTemplate
+                title="Gallery"
+                description="Explore photos of Marvin Motel Katunguru, including rooms, nature views, Kazinga Channel boat cruise scenery, and peaceful outdoor spaces."
+                keywords="Marvin Motel Gallery, Kazinga Channel lodge photos, Queen Elizabeth National Park stay images, Safari accommodation pictures, Katunguru lodge view"
+                url="https://marvinmotel.com/gallery"
+            />
+
             <PictorialGallery images={images} />
         </PublicLayout>
     );
