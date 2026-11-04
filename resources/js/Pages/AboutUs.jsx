@@ -2,6 +2,7 @@ import CoreValues from "@/Components/CoreValues";
 import HeroSection from "@/Components/HeroSection";
 import SEOTemplate from "@/Components/SEOTemplate";
 import PublicLayout from "@/Layouts/PublicLayout";
+import BookingCTA from "@/Components/BookingCTA";
 import { Head } from "@inertiajs/react";
 import React from "react";
 
@@ -42,15 +43,15 @@ function AboutUs({ entranceImage, diningImage, bedImage }) {
 
             <HeroSection
                 titles={[
-                    "Know More About Marvin motel katunguru",
+                    "Know More About Marvin Motel Katunguru",
                     "Delightful Dining Experience You Deserve",
                     "Comfortable And Affordable Rooms",
                 ]}
-                rotationSpeed={5000} // keep smooth rotation
-                subtitle="We have well furnished rooms, including stardard suites and twin doubles, all
-                equipped with bathrooms, hot and cold water, DSTV and free Wifi."
+                rotationSpeed={5000}
+                subtitle="We have well furnished rooms, including standard suites and twin doubles, all equipped with bathrooms, hot and cold water, DSTV and free WiFi."
                 images={[entranceImage, diningImage, bedImage]}
-                bgColor="bg-blue-800"
+                bgColor="bg-emerald-700"
+                textColor="text-white"
                 buttonText="Learn More"
                 buttonLink="#about"
                 buttonColor="bg-amber-600 text-white hover:bg-amber-700"
@@ -118,6 +119,9 @@ function AboutUs({ entranceImage, diningImage, bedImage }) {
 
                 <CoreValues />
             </section>
+            <div className="relative mt-8">
+                <BookingCTA />
+            </div>
         </PublicLayout>
     );
 }

@@ -56,44 +56,44 @@ const PRICING_DATA = {
         rooms: {
             "Single Room": {
                 noAC: {
-                    "Bed Only": 20,
-                    "Bed & Breakfast": 25,
-                    "Half Board": 40,
-                    "Full Board": 50,
-                },
-                AC: {
                     "Bed Only": 25,
                     "Bed & Breakfast": 35,
                     "Half Board": 45,
                     "Full Board": 55,
                 },
+                AC: {
+                    "Bed Only": 30,
+                    "Bed & Breakfast": 40,
+                    "Half Board": 55,
+                    "Full Board": 60,
+                },
             },
             "Double Room": {
                 noAC: {
-                    "Bed Only": 30,
-                    "Bed & Breakfast": 40,
-                    "Half Board": 60,
-                    "Full Board": 80,
-                },
-                AC: {
                     "Bed Only": 35,
                     "Bed & Breakfast": 45,
                     "Half Board": 65,
                     "Full Board": 85,
                 },
+                AC: {
+                    "Bed Only": 40,
+                    "Bed & Breakfast": 50,
+                    "Half Board": 70,
+                    "Full Board": 90,
+                },
             },
             "Twin Room": {
                 noAC: {
-                    "Bed Only": 30,
-                    "Bed & Breakfast": 40,
-                    "Half Board": 60,
-                    "Full Board": 80,
-                },
-                AC: {
                     "Bed Only": 45,
                     "Bed & Breakfast": 55,
                     "Half Board": 65,
                     "Full Board": 85,
+                },
+                AC: {
+                    "Bed Only": 50,
+                    "Bed & Breakfast": 60,
+                    "Half Board": 70,
+                    "Full Board": 90,
                 },
             },
         },
@@ -158,7 +158,7 @@ export default function BookingForm() {
                 const { numberOfNights, totalCost } = calculateStayDetails(
                     checkIn,
                     checkOut,
-                    nightlyRate
+                    nightlyRate,
                 );
 
                 setPriceDetails({
@@ -202,7 +202,7 @@ export default function BookingForm() {
         // Validate dates
         if (priceDetails.numberOfNights <= 0) {
             setStatusMessage(
-                "❌ Please select valid check-in and check-out dates"
+                "❌ Please select valid check-in and check-out dates",
             );
             setLoading(false);
             return;
@@ -214,10 +214,10 @@ export default function BookingForm() {
                 {
                     ...formData,
                     ...priceDetails,
-                }
+                },
             );
             setStatusMessage(
-                "✅ Booking request sent successfully! We'll confirm your reservation shortly."
+                "✅ Booking request sent successfully! We'll confirm your reservation shortly.",
             );
             setFormData({
                 fullName: "",
@@ -237,7 +237,7 @@ export default function BookingForm() {
             });
         } catch (error) {
             setStatusMessage(
-                "❌ Failed to send booking request. Please try again or contact us directly."
+                "❌ Failed to send booking request. Please try again or contact us directly.",
             );
         } finally {
             setLoading(false);
@@ -543,7 +543,7 @@ export default function BookingForm() {
                                         <span className="font-semibold text-lg">
                                             {formatCurrency(
                                                 priceDetails.nightlyRate,
-                                                formData.guestType
+                                                formData.guestType,
                                             )}
                                         </span>
                                     </div>
@@ -575,7 +575,7 @@ export default function BookingForm() {
                                                         {formatCurrency(
                                                             priceDetails.nightlyRate *
                                                                 priceDetails.numberOfNights,
-                                                            formData.guestType
+                                                            formData.guestType,
                                                         )}
                                                     </span>
                                                 </div>
@@ -589,7 +589,7 @@ export default function BookingForm() {
                                                     <span className="text-2xl font-bold text-amber-700">
                                                         {formatCurrency(
                                                             priceDetails.totalCost,
-                                                            formData.guestType
+                                                            formData.guestType,
                                                         )}
                                                     </span>
                                                 </div>

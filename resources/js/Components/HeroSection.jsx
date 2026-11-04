@@ -1,7 +1,65 @@
 import { Link } from "@inertiajs/react";
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, Sparkles, Zap, Target } from "lucide-react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+
+const SPRING = { type: "spring", stiffness: 90, damping: 18 };
+
+/*
+ * The image fills the whole right column, edge to edge, top to bottom.
+ * Its inner edge is cut into an arch, and stepped "ripple" bands sit behind
+ * it. On mobile the image drops below the text and the arch moves to its top.
+ */
+const pointEdge = (d) => ({
+    lg: `polygon(${d}% 0, 100% 0, 100% 100%, ${d}% 100%, 0 50%)`,
+    sm: `polygon(0 ${Math.round(d * 0.8)}%, 50% 0, 100% ${Math.round(
+        d * 0.8,
+    )}%, 100% 100%, 0 100%)`,
+});
+
+const EDGES = {
+    arch: {
+        lg: "ellipse(100% 70% at 100% 50%)",
+        sm: "ellipse(72% 100% at 50% 100%)",
+    },
+    round: {
+        lg: "ellipse(100% 52% at 100% 50%)",
+        sm: "ellipse(60% 100% at 50% 100%)",
+    },
+    pentagon: pointEdge(18),
+    hexagon: pointEdge(30),
+    diamond: pointEdge(45),
+};
+
+const CSS = `
+.hx-layer{position:absolute;inset:0;top:var(--o,0px);clip-path:var(--clip-sm);}
+.hx-fill{position:absolute;inset:0;background:currentColor;opacity:var(--ro,.1);transition:opacity .5s ease;}
+@media (min-width:1024px){
+  .hx-layer{top:0;left:var(--o,0px);clip-path:var(--clip-lg);}
+}
+@media (prefers-reduced-motion:no-preference){
+  .hx-layer.hx-ring{transition:transform .7s cubic-bezier(.2,.7,.2,1);}
+  .hx-panel-hover:hover .hx-ring{transform:translateY(-.75rem);}
+  @media (min-width:1024px){
+    .hx-panel-hover:hover .hx-ring{transform:translateX(-.75rem);}
+  }
+  .hx-pulse .hx-fill{animation:hx-pulse 3.4s ease-in-out infinite;}
+  .hx-pulse .hx-ring:nth-of-type(2) .hx-fill{animation-delay:.6s;}
+  .hx-morph{animation:hx-morph-sm 9s ease-in-out infinite alternate;}
+  @media (min-width:1024px){
+    .hx-morph{animation-name:hx-morph-lg;}
+  }
+}
+@keyframes hx-pulse{0%,100%{opacity:var(--ro,.1);}50%{opacity:calc(var(--ro,.1) * 2.4);}}
+@keyframes hx-morph-sm{
+  from{clip-path:ellipse(62% 100% at 50% 100%);}
+  to{clip-path:ellipse(92% 86% at 50% 100%);}
+}
+@keyframes hx-morph-lg{
+  from{clip-path:ellipse(100% 60% at 100% 50%);}
+  to{clip-path:ellipse(100% 84% at 100% 50%);}
+}
+`;
 
 export default function HeroSection({
     titles = [],
@@ -24,7 +82,6 @@ export default function HeroSection({
     imageShape = "rectangle",
     imageAnimationDirection = "right",
     enableMorph = false,
-    // NEW DESIGN PROPS
     pattern = "none", // "none", "grid", "dots", "circuit", "topography"
     glowEffect = false,
     particleEffect = false,
@@ -34,435 +91,263 @@ export default function HeroSection({
     const [index, setIndex] = useState(0);
     const [text, setText] = useState("");
     const [isTyping, setIsTyping] = useState(true);
-    const [isHovered, setIsHovered] = useState(false);
-
-    const computedTextColor = bgImage ? "text-white" : textColor;
+    const reduceMotion = useReducedMotion();
 
     const imageArray = Array.isArray(images) ? images : images ? [images] : [];
-    const hasMultipleImages = imageArray.length > 1;
+    const count = Math.max(titles.length, imageArray.length);
+    const computedTextColor = bgImage ? "text-white" : textColor;
+    const hasImage = imageArray.length > 0;
+    const currentImage = hasImage
+        ? imageArray[index % imageArray.length]
+        : null;
+    const currentTitle = titles.length ? titles[index % titles.length] : "";
+    const isMorph = imageShape === "morph" || enableMorph;
 
-    // Typing Animation
+    /* ---------- Typing animation ---------- */
     useEffect(() => {
         if (animationMode !== "typing" || !titles.length) return;
         const word = titles[index % titles.length] || "";
         let i = 0;
+        let next;
         setText("");
         setIsTyping(true);
         const typeInt = setInterval(() => {
-            setText(word.slice(0, ++i));
-            if (i === word.length) {
+            i += 1;
+            setText(word.slice(0, i));
+            if (i >= word.length) {
                 clearInterval(typeInt);
                 setIsTyping(false);
-                if (titles.length > 1)
-                    setTimeout(
-                        () => setIndex((p) => (p + 1) % titles.length),
-                        rotationSpeed
+                if (count > 1) {
+                    next = setTimeout(
+                        () => setIndex((p) => (p + 1) % count),
+                        rotationSpeed,
                     );
+                }
             }
         }, typingSpeed);
-        return () => clearInterval(typeInt);
-    }, [index, titles, typingSpeed, rotationSpeed, animationMode]);
+        return () => {
+            clearInterval(typeInt);
+            clearTimeout(next);
+        };
+    }, [index, titles, typingSpeed, rotationSpeed, animationMode, count]);
 
-    // Fade Animation
+    /* ---------- Fade rotation (titles and/or images) ---------- */
     useEffect(() => {
-        if (animationMode === "fade" && titles.length)
-            setTimeout(
-                () => setIndex((p) => (p + 1) % titles.length),
-                rotationSpeed
-            );
-    }, [index, titles, rotationSpeed, animationMode]);
+        const typingDrivesRotation =
+            animationMode === "typing" && titles.length > 0;
+        if (typingDrivesRotation || count <= 1) return;
+        const t = setTimeout(
+            () => setIndex((p) => (p + 1) % count),
+            rotationSpeed,
+        );
+        return () => clearTimeout(t);
+    }, [index, count, rotationSpeed, animationMode, titles.length]);
 
-    // Pattern background styles
-    const getPatternStyle = () => {
+    /* ---------- Background pattern (fades out toward the edges) ---------- */
+    const patternStyle = (() => {
         switch (pattern) {
             case "grid":
                 return {
-                    backgroundImage: `
-                        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)
-                    `,
-                    backgroundSize: "50px 50px",
+                    backgroundImage:
+                        "linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)",
+                    backgroundSize: "56px 56px",
                 };
             case "dots":
                 return {
-                    backgroundImage: `radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px)`,
-                    backgroundSize: "30px 30px",
+                    backgroundImage:
+                        "radial-gradient(currentColor 1.2px, transparent 1.2px)",
+                    backgroundSize: "28px 28px",
                 };
             case "circuit":
                 return {
-                    backgroundImage: `
-                        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px),
-                        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px)
-                    `,
+                    backgroundImage:
+                        "linear-gradient(90deg, currentColor 1px, transparent 1px), linear-gradient(currentColor 1px, transparent 1px)",
                     backgroundSize: "40px 40px",
                 };
             case "topography":
                 return {
-                    backgroundImage: `
-                        linear-gradient(90deg, transparent 79px, rgba(255,255,255,0.1) 79px, rgba(255,255,255,0.1) 81px, transparent 81px),
-                        linear-gradient(rgba(255,255,255,0.02) 79px, transparent 79px)
-                    `,
-                    backgroundSize: "100% 80px",
+                    backgroundImage:
+                        "repeating-linear-gradient(0deg, currentColor 0 1px, transparent 1px 22px)",
                 };
             default:
-                return {};
+                return null;
         }
+    })();
+
+    /* ---------- Entrance variants ---------- */
+    const offset = 32;
+    const textContainer = {
+        hidden: {},
+        visible: { transition: { staggerChildren: 0.12 } },
     };
-
-    // Focus ring styles
-    const getFocusRingClass = () => {
-        switch (focusRing) {
-            case "hover":
-                return "focus-ring-hover";
-            case "always":
-                return "focus-ring-always";
-            case "pulse":
-                return "focus-ring-pulse";
-            default:
-                return "";
-        }
-    };
-
-    // Morphing animation variants
-    const morphVariants = {
-        animate: {
-            borderRadius: [
-                "60% 40% 30% 70% / 60% 30% 70% 40%",
-                "50% 50% 60% 40% / 50% 60% 40% 50%",
-                "40% 60% 70% 30% / 40% 70% 30% 60%",
-                "60% 40% 30% 70% / 60% 30% 70% 40%",
-            ],
-            transition: {
-                borderRadius: {
-                    duration: 10,
-                    repeat: Infinity,
-                    repeatType: "reverse",
-                    ease: "easeInOut",
-                },
-            },
-        },
-    };
-
-    // Enhanced slide animation variants with spring physics
-    const getSlideVariants = (direction) => {
-        const distance = 100;
-        switch (direction) {
-            case "left":
-                return {
-                    hidden: { opacity: 0, x: -distance, scale: 0.95 },
-                    visible: {
-                        opacity: 1,
-                        x: 0,
-                        scale: 1,
-                        transition: {
-                            type: "spring",
-                            stiffness: 100,
-                            damping: 15,
-                            duration: 0.8,
-                        },
-                    },
-                };
-            case "right":
-                return {
-                    hidden: { opacity: 0, x: distance, scale: 0.95 },
-                    visible: {
-                        opacity: 1,
-                        x: 0,
-                        scale: 1,
-                        transition: {
-                            type: "spring",
-                            stiffness: 100,
-                            damping: 15,
-                            duration: 0.8,
-                        },
-                    },
-                };
-            case "top":
-                return {
-                    hidden: { opacity: 0, y: -distance, scale: 0.95 },
-                    visible: {
-                        opacity: 1,
-                        y: 0,
-                        scale: 1,
-                        transition: {
-                            type: "spring",
-                            stiffness: 100,
-                            damping: 15,
-                            duration: 0.8,
-                        },
-                    },
-                };
-            case "bottom":
-                return {
-                    hidden: { opacity: 0, y: distance, scale: 0.95 },
-                    visible: {
-                        opacity: 1,
-                        y: 0,
-                        scale: 1,
-                        transition: {
-                            type: "spring",
-                            stiffness: 100,
-                            damping: 15,
-                            duration: 0.8,
-                        },
-                    },
-                };
-            default:
-                return {
-                    hidden: { opacity: 0, scale: 0.9, rotateY: 10 },
-                    visible: {
-                        opacity: 1,
-                        scale: 1,
-                        rotateY: 0,
-                        transition: {
-                            type: "spring",
-                            stiffness: 120,
-                            damping: 12,
-                            duration: 0.6,
-                        },
-                    },
-                };
-        }
-    };
-
-    // Get shape classes with enhanced styling
-    const getShapeClass = () => {
-        const baseClass = "relative overflow-hidden shadow-2xl";
-        switch (imageShape) {
-            case "oval":
-                return `${baseClass} rounded-[50%] border-4 border-white/20`;
-            case "circle":
-                return `${baseClass} rounded-full border-4 border-white/20`;
-            case "pentagon":
-                return `${baseClass} clip-pentagon border-4 border-white/20`;
-            case "hexagon":
-                return `${baseClass} clip-hexagon border-4 border-white/20`;
-            case "diamond":
-                return `${baseClass} clip-diamond rotate-45 border-4 border-white/20`;
-            case "morph":
-                return `${baseClass} rounded-3xl border-4 border-white/20`;
-            case "rectangle":
-            default:
-                return `${baseClass} rounded-3xl border-4 border-white/20 ${getFocusRingClass()}`;
-        }
-    };
-
-    // Enhanced Image Container with glow and particle effects
-    const ImageContainer = ({ children, currentIndex }) => {
-        const shapeClass = getShapeClass();
-        const isMorphShape = imageShape === "morph" || enableMorph;
-        const slideVariants = getSlideVariants(imageAnimationDirection);
-
-        if (isMorphShape) {
-            return (
-                <motion.div
-                    className={`${shapeClass} relative group`}
-                    style={{
-                        width: imageWidth,
-                        height: imageHeight,
-                        maxHeight: imageHeight,
-                    }}
-                    variants={morphVariants}
-                    animate="animate"
-                    whileHover={{
-                        scale: 1.05,
-                        transition: { duration: 0.4, type: "spring" },
-                    }}
-                    onHoverStart={() => setIsHovered(true)}
-                    onHoverEnd={() => setIsHovered(false)}
-                >
-                    {glowEffect && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500" />
-                    )}
-                    {children}
-                    {particleEffect && (
-                        <div className="absolute inset-0 overflow-hidden rounded-3xl">
-                            {[...Array(5)].map((_, i) => (
-                                <motion.div
-                                    key={i}
-                                    className="absolute w-2 h-2 bg-white/30 rounded-full"
-                                    animate={{
-                                        x: [0, 100, 0],
-                                        y: [0, 50, 0],
-                                        opacity: [0, 1, 0],
-                                    }}
-                                    transition={{
-                                        duration: 3,
-                                        repeat: Infinity,
-                                        delay: i * 0.6,
-                                        ease: "easeInOut",
-                                    }}
-                                    style={{
-                                        left: `${20 + i * 15}%`,
-                                        top: `${10 + i * 10}%`,
-                                    }}
-                                />
-                            ))}
-                        </div>
-                    )}
-                </motion.div>
-            );
-        }
-
-        return (
-            <motion.div
-                className={`${shapeClass} relative group`}
-                style={{
-                    width: imageWidth,
-                    height: imageHeight,
-                    maxHeight: imageHeight,
-                }}
-                variants={slideVariants}
-                whileHover={{
-                    scale: 1.05,
-                    transition: { duration: 0.4, type: "spring" },
-                }}
-                onHoverStart={() => setIsHovered(true)}
-                onHoverEnd={() => setIsHovered(false)}
-            >
-                {glowEffect && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500" />
-                )}
-                {children}
-                {particleEffect && (
-                    <div className="absolute inset-0 overflow-hidden rounded-3xl">
-                        {[...Array(5)].map((_, i) => (
-                            <motion.div
-                                key={i}
-                                className="absolute w-2 h-2 bg-white/30 rounded-full"
-                                animate={{
-                                    x: [0, 100, 0],
-                                    y: [0, 50, 0],
-                                    opacity: [0, 1, 0],
-                                }}
-                                transition={{
-                                    duration: 3,
-                                    repeat: Infinity,
-                                    delay: i * 0.6,
-                                    ease: "easeInOut",
-                                }}
-                                style={{
-                                    left: `${20 + i * 15}%`,
-                                    top: `${10 + i * 10}%`,
-                                }}
-                            />
-                        ))}
-                    </div>
-                )}
-            </motion.div>
-        );
-    };
-
-    const textVariants = {
+    const textItem = {
         hidden: {
             opacity: 0,
             y:
                 animationDirection === "top"
-                    ? -40
+                    ? -offset
                     : animationDirection === "bottom"
-                    ? 40
-                    : 0,
+                      ? offset
+                      : 0,
             x:
                 animationDirection === "left"
-                    ? -40
+                    ? -offset
                     : animationDirection === "right"
-                    ? 40
-                    : 0,
+                      ? offset
+                      : 0,
         },
-        visible: {
-            opacity: 1,
-            y: 0,
-            x: 0,
-            transition: {
-                duration: 0.8,
-                type: "spring",
-                stiffness: 100,
-                damping: 15,
+        visible: { opacity: 1, x: 0, y: 0, transition: SPRING },
+    };
+
+    const imageVariants = (() => {
+        const d = 60;
+        const axis = {
+            left: { x: -d },
+            right: { x: d },
+            top: { y: -d },
+            bottom: { y: d },
+        }[imageAnimationDirection] || { scale: 0.92 };
+        return {
+            hidden: { opacity: 0, ...axis },
+            visible: {
+                opacity: 1,
+                x: 0,
+                y: 0,
+                transition: SPRING,
             },
-        },
-    };
+            exit: {
+                opacity: 0,
+                transition: { duration: 0.5 },
+            },
+        };
+    })();
 
-    const getCurrentImage = () => {
-        if (imageArray.length === 0) return null;
-        if (hasMultipleImages) {
-            return imageArray[index % imageArray.length];
-        }
-        return imageArray[0];
-    };
+    /* ---------- Image panel: edge shape + ripple bands ---------- */
+    const edge = isMorph ? EDGES.arch : EDGES[imageShape] || EDGES.arch;
 
-    const currentImage = getCurrentImage();
+    // focusRing drives the ripple bands behind the image
+    const ringBoost = focusRing === "always" ? 1.8 : 1;
+    const panelClass = [
+        focusRing === "hover" ? "hx-panel-hover" : "",
+        focusRing === "pulse" ? "hx-pulse" : "",
+    ].join(" ");
+
+    const buttonClasses = `group/btn inline-flex max-w-fit items-center gap-3 rounded-full py-2 pl-7 pr-2 font-medium shadow-lg shadow-black/10 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 ${buttonColor}`;
+
+    const buttonInner = (
+        <>
+            {buttonText}
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 transition-transform duration-300 group-hover/btn:translate-x-0.5">
+                <ArrowRight className="h-4 w-4" />
+            </span>
+        </>
+    );
+
+    const gradientClass = titleGradient
+        ? `bg-clip-text text-transparent ${titleGradient}`
+        : "";
 
     return (
         <section
-            className={`${!bgImage && bgColor} relative pt-10 overflow-hidden`}
+            className={`${bgImage ? "" : bgColor} ${computedTextColor} relative isolate overflow-hidden`}
             style={
                 bgImage
                     ? {
                           background: `url(${bgImage}) center/cover no-repeat`,
-                          ...getPatternStyle(),
                       }
-                    : getPatternStyle()
+                    : undefined
             }
         >
+            <style>{CSS}</style>
+
+            {/* Image scrim */}
             {bgImage && (
-                <div className="absolute inset-0 bg-black/65 dark:bg-black/70" />
+                <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/60 to-black/80" />
             )}
 
-            {/* Animated background elements - INCREASED SIZE */}
+            {/* Pattern */}
+            {patternStyle && (
+                <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 -z-10 opacity-[0.07]"
+                    style={{
+                        ...patternStyle,
+                        WebkitMaskImage:
+                            "radial-gradient(ellipse 70% 70% at 50% 40%, #000 30%, transparent 100%)",
+                        maskImage:
+                            "radial-gradient(ellipse 70% 70% at 50% 40%, #000 30%, transparent 100%)",
+                    }}
+                />
+            )}
+
+            {/* Soft ambient light */}
             {decorativeElements && (
-                <>
+                <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 -z-10"
+                >
                     <motion.div
-                        className="absolute top-10 left-24 text-blue-400/20"
-                        animate={{ rotate: 360 }}
+                        className="absolute -left-32 -top-32 h-[28rem] w-[28rem] rounded-full bg-blue-500/25 blur-3xl"
+                        animate={
+                            reduceMotion
+                                ? undefined
+                                : { x: [0, 40, 0], y: [0, 30, 0] }
+                        }
                         transition={{
-                            duration: 20,
+                            duration: 18,
                             repeat: Infinity,
-                            ease: "linear",
+                            ease: "easeInOut",
                         }}
-                        style={{ width: "100px", height: "100px" }} // Increased from 40px to 80px
-                    >
-                        <Sparkles size={300} /> {/* Increased from 40 to 80 */}
-                    </motion.div>
+                    />
                     <motion.div
-                        className="absolute bottom-20 right-20 text-purple-400/20"
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{ duration: 4, repeat: Infinity }}
-                        style={{ width: "80px", height: "80px" }} // Increased from 30px to 60px
-                    >
-                        <Zap size={60} /> {/* Increased from 30 to 60 */}
-                    </motion.div>
-                </>
+                        className="absolute -bottom-40 right-0 h-[26rem] w-[26rem] rounded-full bg-violet-500/20 blur-3xl"
+                        animate={
+                            reduceMotion
+                                ? undefined
+                                : { x: [0, -30, 0], y: [0, -40, 0] }
+                        }
+                        transition={{
+                            duration: 22,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                        }}
+                    />
+                </div>
             )}
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-8 grid lg:grid-cols-2 gap-10 items-center relative z-10">
+            {/* ---------- Copy ---------- */}
+            <div
+                className={`relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 ${
+                    hasImage
+                        ? "pb-12 pt-16 sm:pt-20 lg:flex lg:min-h-[40rem] lg:items-center lg:py-0"
+                        : "flex justify-center py-16 text-center sm:py-20 lg:py-28"
+                }`}
+            >
                 <motion.div
+                    variants={textContainer}
                     initial="hidden"
                     animate="visible"
-                    variants={textVariants}
-                    className="flex flex-col relative"
+                    className={`flex flex-col ${
+                        hasImage
+                            ? "lg:w-1/2 lg:py-28 lg:pr-14"
+                            : "max-w-3xl items-center"
+                    }`}
                 >
-                    {/* Text background glow */}
-                    {glowEffect && (
-                        <div className="absolute -inset-4 bg-gradient-to-r from-blue-600/10 to-purple-600/10 blur-2xl rounded-full opacity-50 group-hover:opacity-75 transition-opacity duration-300" />
-                    )}
-
-                    <h1
-                        className={`font-extrabold text-white text-5xl sm:text-8xl mb-6 min-h-[4.5rem] relative ${
-                            titleGradient
-                                ? `bg-clip-text text-transparent ${titleGradient}`
-                                : computedTextColor
-                        }`}
+                    <motion.h1
+                        variants={textItem}
+                        className="mb-6 min-h-[1.1em] text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl"
                     >
                         {animationMode === "typing" ? (
                             <>
-                                {text}
+                                <span className={gradientClass}>{text}</span>
                                 {titles.length > 0 && (
                                     <span
-                                        className={`ml-1 w-1 ${
+                                        aria-hidden
+                                        className={`ml-1 inline-block h-[0.85em] w-[3px] translate-y-[0.1em] rounded-full bg-current ${
                                             isTyping
                                                 ? "opacity-100"
-                                                : "opacity-0"
-                                        } bg-current inline-block animate-pulse`}
+                                                : "animate-pulse opacity-60"
+                                        }`}
                                     />
                                 )}
                             </>
@@ -470,197 +355,206 @@ export default function HeroSection({
                             <AnimatePresence mode="wait">
                                 <motion.span
                                     key={index}
-                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    exit={{ opacity: 0, y: -10, scale: 1.05 }}
-                                    transition={{
-                                        duration: 0.6,
-                                        type: "spring",
-                                    }}
-                                    className="inline-block"
+                                    initial={{ opacity: 0, y: 14 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -14 }}
+                                    transition={{ duration: 0.45 }}
+                                    className={`inline-block pb-1 ${gradientClass}`}
                                 >
-                                    {titles[index % titles.length] || ""}
+                                    {currentTitle}
                                 </motion.span>
                             </AnimatePresence>
                         )}
-                    </h1>
+                    </motion.h1>
 
                     {subtitle && (
                         <motion.p
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.3, duration: 0.6 }}
-                            className={`text-lg font-extralight max-w-lg mb-6 relative z-10 ${
-                                bgImage
-                                    ? "text-gray-200"
-                                    : "text-gray-300 dark:text-gray-300"
-                            }`}
+                            variants={textItem}
+                            className="mb-8 max-w-xl text-lg leading-relaxed opacity-75 sm:text-xl"
                         >
                             {subtitle}
                         </motion.p>
                     )}
 
-                    {/* Enhanced Button with better styling */}
                     {buttonText && buttonLink && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.5, duration: 0.6 }}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="relative group/btn"
-                        >
+                        <motion.div variants={textItem}>
                             {buttonLink.startsWith("#") ? (
                                 <button
+                                    type="button"
                                     onClick={(e) => {
                                         e.preventDefault();
-                                        const target =
-                                            document.querySelector(buttonLink);
-                                        if (target) {
-                                            target.scrollIntoView({
+                                        document
+                                            .querySelector(buttonLink)
+                                            ?.scrollIntoView({
                                                 behavior: "smooth",
                                                 block: "start",
                                             });
-                                        }
                                     }}
-                                    className={`relative inline-flex max-w-fit items-center gap-2 font-semibold px-8 py-4 rounded-2xl shadow-2xl ${buttonColor} transition-all duration-300 overflow-hidden group`}
+                                    className={buttonClasses}
                                 >
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                                    {buttonText}
-                                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
+                                    {buttonInner}
                                 </button>
                             ) : (
                                 <Link
                                     href={buttonLink}
-                                    className={`relative inline-flex max-w-fit items-center gap-2 font-semibold px-8 py-4 rounded-2xl shadow-2xl ${buttonColor} transition-all duration-300 overflow-hidden group`}
+                                    className={buttonClasses}
                                 >
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                                    {buttonText}
-                                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
+                                    {buttonInner}
                                 </Link>
                             )}
                         </motion.div>
                     )}
-                </motion.div>
 
-                {currentImage && (
-                    <motion.div
-                        initial="hidden"
-                        animate="visible"
-                        className="flex justify-center relative"
-                    >
-                        <AnimatePresence mode="wait">
-                            <motion.div
-                                key={index}
-                                initial="hidden"
-                                animate="visible"
-                                exit="hidden"
-                                className="w-full"
-                            >
-                                <ImageContainer currentIndex={index}>
-                                    <img
-                                        src={currentImage}
-                                        alt={
-                                            titles[index % titles.length] ||
-                                            "Hero image"
-                                        }
-                                        className={`w-full h-full transition-all duration-500 ${
-                                            imageShape === "diamond"
-                                                ? "-rotate-45"
-                                                : ""
-                                        } ${
-                                            isHovered
-                                                ? "brightness-110"
-                                                : "brightness-100"
-                                        }`}
-                                        style={{ objectFit: imageObjectFit }}
-                                        loading="lazy"
-                                    />
-                                    {/* Enhanced gradient overlay */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/20 group-hover:to-black/10 transition-all duration-500"></div>
-                                    {/* Shine effect on hover */}
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                                </ImageContainer>
-                            </motion.div>
-                        </AnimatePresence>
-                    </motion.div>
-                )}
+                    {/* Slide indicator */}
+                    {count > 1 && (
+                        <motion.div
+                            variants={textItem}
+                            className="mt-10 flex items-center gap-2"
+                            role="tablist"
+                            aria-label="Hero slides"
+                        >
+                            {Array.from({ length: count }).map((_, i) => (
+                                <button
+                                    key={i}
+                                    type="button"
+                                    role="tab"
+                                    aria-selected={i === index % count}
+                                    aria-label={`Show slide ${i + 1}`}
+                                    onClick={() => setIndex(i)}
+                                    className={`h-1.5 rounded-full transition-all duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                                        i === index % count
+                                            ? "w-10 bg-current"
+                                            : "w-4 bg-current opacity-25 hover:opacity-50"
+                                    }`}
+                                />
+                            ))}
+                        </motion.div>
+                    )}
+                </motion.div>
             </div>
 
-            {/* Enhanced CSS for custom shapes and effects */}
-            <style jsx>{`
-                .clip-pentagon {
-                    clip-path: polygon(
-                        50% 0%,
-                        100% 38%,
-                        82% 100%,
-                        18% 100%,
-                        0% 38%
-                    );
-                }
-                .clip-hexagon {
-                    clip-path: polygon(
-                        25% 0%,
-                        75% 0%,
-                        100% 50%,
-                        75% 100%,
-                        25% 100%,
-                        0% 50%
-                    );
-                }
-                .clip-diamond {
-                    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-                }
+            {/* ---------- Image: fills the right column edge to edge ---------- */}
+            {currentImage && (
+                <div
+                    className="relative h-[var(--hx-h)] lg:absolute lg:inset-y-0 lg:right-0 lg:h-auto lg:w-1/2"
+                    style={{ "--hx-h": imageHeight }}
+                >
+                    <div
+                        className={`relative ml-auto h-full ${panelClass}`}
+                        style={{
+                            width: imageWidth,
+                            maxWidth: "100%",
+                            "--clip-lg": edge.lg,
+                            "--clip-sm": edge.sm,
+                        }}
+                    >
+                        {glowEffect && (
+                            <div
+                                aria-hidden
+                                className="pointer-events-none absolute inset-y-10 -left-10 right-10 rounded-full bg-gradient-to-tr from-blue-500/40 to-violet-500/40 blur-3xl"
+                            />
+                        )}
 
-                /* Focus ring effects */
-                .focus-ring-hover {
-                    transition: all 0.3s ease;
-                }
-                .focus-ring-hover:hover {
-                    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
-                }
+                        {/* Ripple bands behind the image */}
+                        {decorativeElements && (
+                            <>
+                                <div
+                                    aria-hidden
+                                    className={`hx-layer hx-ring ${isMorph ? "hx-morph" : ""}`}
+                                    style={{ "--o": "0px" }}
+                                >
+                                    <div
+                                        className="hx-fill"
+                                        style={{ "--ro": 0.07 * ringBoost }}
+                                    />
+                                </div>
+                                <div
+                                    aria-hidden
+                                    className={`hx-layer hx-ring ${isMorph ? "hx-morph" : ""}`}
+                                    style={{ "--o": "1.5rem" }}
+                                >
+                                    <div
+                                        className="hx-fill"
+                                        style={{ "--ro": 0.12 * ringBoost }}
+                                    />
+                                </div>
+                            </>
+                        )}
 
-                .focus-ring-always {
-                    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-                    animation: gentle-pulse 3s infinite;
-                }
+                        {/* The image itself */}
+                        <div
+                            className={`hx-layer overflow-hidden bg-black/20 ${isMorph ? "hx-morph" : ""}`}
+                            style={{
+                                "--o": decorativeElements ? "3rem" : "0px",
+                            }}
+                        >
+                            <AnimatePresence initial>
+                                <motion.div
+                                    key={index}
+                                    variants={imageVariants}
+                                    initial="hidden"
+                                    animate="visible"
+                                    exit="exit"
+                                    className="absolute inset-0"
+                                >
+                                    <motion.img
+                                        src={currentImage}
+                                        alt={currentTitle || "Hero image"}
+                                        loading="lazy"
+                                        className="h-full w-full"
+                                        style={{ objectFit: imageObjectFit }}
+                                        initial={
+                                            reduceMotion
+                                                ? false
+                                                : { scale: 1.12 }
+                                        }
+                                        animate={{ scale: 1 }}
+                                        transition={{
+                                            duration: Math.max(
+                                                rotationSpeed / 1000 + 1,
+                                                4,
+                                            ),
+                                            ease: "easeOut",
+                                        }}
+                                    />
+                                </motion.div>
+                            </AnimatePresence>
 
-                .focus-ring-pulse {
-                    animation: gentle-pulse 2s infinite;
-                }
+                            {/* Depth: darken the base and the edge that meets the text */}
+                            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+                            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-transparent lg:bg-gradient-to-r" />
 
-                @keyframes gentle-pulse {
-                    0%,
-                    100% {
-                        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-                    }
-                    50% {
-                        box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.1);
-                    }
-                }
-
-                /* Enhanced pattern backgrounds */
-                .pattern-grid {
-                    background-image: linear-gradient(
-                            rgba(255, 255, 255, 0.05) 1px,
-                            transparent 1px
-                        ),
-                        linear-gradient(
-                            90deg,
-                            rgba(255, 255, 255, 0.05) 1px,
-                            transparent 1px
-                        );
-                    background-size: 50px 50px;
-                }
-
-                .pattern-dots {
-                    background-image: radial-gradient(
-                        rgba(255, 255, 255, 0.1) 1px,
-                        transparent 1px
-                    );
-                    background-size: 30px 30px;
-                }
-            `}</style>
+                            {particleEffect && !reduceMotion && (
+                                <div
+                                    aria-hidden
+                                    className="pointer-events-none absolute inset-0"
+                                >
+                                    {[...Array(6)].map((_, i) => (
+                                        <motion.span
+                                            key={i}
+                                            className="absolute h-1.5 w-1.5 rounded-full bg-white/60"
+                                            style={{
+                                                left: `${20 + i * 13}%`,
+                                                bottom: `${8 + (i % 3) * 10}%`,
+                                            }}
+                                            animate={{
+                                                y: [0, -120, -220],
+                                                opacity: [0, 0.9, 0],
+                                            }}
+                                            transition={{
+                                                duration: 4 + (i % 3),
+                                                repeat: Infinity,
+                                                delay: i * 0.7,
+                                                ease: "easeOut",
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </section>
     );
 }

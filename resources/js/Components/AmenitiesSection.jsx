@@ -1,5 +1,5 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, MotionConfig } from "framer-motion";
 import {
     Wifi,
     Coffee,
@@ -10,7 +10,6 @@ import {
     Users,
     BedDouble,
 } from "lucide-react";
-import BookingCTA from "./BookingCTA";
 
 const amenities = [
     {
@@ -63,57 +62,117 @@ const amenities = [
     },
 ];
 
+const serif = {
+    fontFamily: "'Cormorant Garamond', 'Playfair Display', Georgia, serif",
+};
+
+const list = {
+    hidden: {},
+    show: { transition: { staggerChildren: 0.08 } },
+};
+
+const item = {
+    hidden: { opacity: 0, y: 24 },
+    show: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    },
+};
+
 export default function AmenitiesSection() {
     return (
-        <section className="py-20 pb-0 bg-blue-800 text-gray-800">
-            <div className="container mx-auto px-6 md:px-12 lg:px-20 text-center">
-                {/* Section Header */}
-                <motion.h2
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
-                    viewport={{ once: true }}
-                    className="text-4xl md:text-5xl font-bold text-slate-100 mb-4"
-                >
-                    Amenities & Services
-                </motion.h2>
-                <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
-                    viewport={{ once: true }}
-                    className="text-gray-50 max-w-2xl mx-auto mb-16 text-lg"
-                >
-                    At Marvin Motel Katunguru, we combine comfort, convenience,
-                    and authentic Ugandan hospitality to make every moment of
-                    your stay memorable.
-                </motion.p>
+        <MotionConfig reducedMotion="user">
+            <section
+                aria-labelledby="amenities-heading"
+                className="relative overflow-hidden bg-emerald-950 pb-0 pt-24 text-emerald-50 sm:pt-28"
+            >
+                {/* Soft light from the corner, like sun through leaves */}
+                <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -right-40 -top-40 h-[34rem] w-[34rem] rounded-full bg-emerald-500/15 blur-3xl"
+                />
+                <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -left-32 bottom-1/3 h-96 w-96 rounded-full bg-orange-500/10 blur-3xl"
+                />
 
-                {/* Amenities Grid */}
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
-                    {amenities.map((item, index) => (
+                <div className="relative mx-auto max-w-7xl px-6 sm:px-10 lg:px-12">
+                    <div className="grid gap-14 lg:grid-cols-12 lg:gap-16">
+                        {/* Intro: stays in view while the list scrolls on large screens */}
                         <motion.div
-                            key={index}
-                            initial={{ opacity: 0, y: 40 }}
+                            initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: index * 0.1 }}
-                            viewport={{ once: true }}
-                            className="bg-gray-50 p-8 rounded-3xl shadow-md hover:shadow-lg transition border border-gray-100"
+                            viewport={{ once: true, margin: "-80px" }}
+                            transition={{
+                                duration: 0.8,
+                                ease: [0.22, 1, 0.36, 1],
+                            }}
+                            className="lg:col-span-4"
                         >
-                            <div className="flex justify-center mb-6">
-                                <item.icon className="w-12 h-12 text-green-600" />
+                            <div className="lg:sticky lg:top-40">
+                                <h2
+                                    id="amenities-heading"
+                                    style={serif}
+                                    className="text-5xl font-semibold leading-[1.05] tracking-tight text-white md:text-6xl"
+                                >
+                                    Amenities & Services
+                                </h2>
+
+                                <span
+                                    aria-hidden="true"
+                                    className="mt-6 block h-[3px] w-16 rounded-full bg-gradient-to-r from-orange-500 to-orange-300"
+                                />
+
+                                <p className="mt-6 max-w-md text-lg leading-relaxed text-emerald-100/80">
+                                    At Marvin Motel Katunguru, we combine
+                                    comfort, convenience, and authentic Ugandan
+                                    hospitality to make every moment of your
+                                    stay memorable.
+                                </p>
                             </div>
-                            <h3 className="text-xl font-semibold text-gay-700 mb-2">
-                                {item.title}
-                            </h3>
-                            <p className="text-gray-600 leading-relaxed">
-                                {item.description}
-                            </p>
                         </motion.div>
-                    ))}
+
+                        {/* Amenities: a list with hairline dividers, not a wall of cards */}
+                        <motion.ul
+                            variants={list}
+                            initial="hidden"
+                            whileInView="show"
+                            viewport={{ once: true, margin: "-60px" }}
+                            className="grid gap-x-14 sm:grid-cols-2 lg:col-span-8"
+                        >
+                            {amenities.map(
+                                ({ icon: Icon, title, description }) => (
+                                    <motion.li
+                                        key={title}
+                                        variants={item}
+                                        className="group flex gap-5 border-t border-emerald-100/15 py-8"
+                                    >
+                                        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-emerald-300/40 text-emerald-300 transition-all duration-300 group-hover:border-orange-500 group-hover:bg-orange-500 group-hover:text-white">
+                                            <Icon
+                                                className="h-5 w-5"
+                                                aria-hidden="true"
+                                            />
+                                        </span>
+
+                                        <div>
+                                            <h3
+                                                style={serif}
+                                                className="text-2xl font-semibold text-white"
+                                            >
+                                                {title}
+                                            </h3>
+                                            <p className="mt-2 leading-relaxed text-emerald-100/75">
+                                                {description}
+                                            </p>
+                                        </div>
+                                    </motion.li>
+                                ),
+                            )}
+                        </motion.ul>
+                    </div>
                 </div>
-            </div>
-            <BookingCTA />
-        </section>
+            </section>
+        </MotionConfig>
     );
 }
